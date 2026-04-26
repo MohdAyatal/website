@@ -1,4 +1,32 @@
 <!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════
+  WHOLESALE BAZAAR — SETUP CHECKLIST (read before going live)
+═══════════════════════════════════════════════════════════════════
+  1. GA4 ID         → Search "G-XXXXXXXXXX" → replace with your real ID
+                      Get it free at analytics.google.com
+
+  2. Razorpay Key   → Search "rzp_test_YOUR_KEY_HERE" → replace with
+                      your key from razorpay.com → Settings → API Keys
+                      Use rzp_test_... for testing, rzp_live_... for real payments
+
+  3. EmailJS        → Search "YOUR_EMAILJS_PUBLIC_KEY" → replace 3 values:
+                      EMAILJS_PUBLIC_KEY  → emailjs.com → Account → API Keys
+                      EMAILJS_SERVICE_ID  → Email Services tab
+                      EMAILJS_TEMPLATE_ID → Email Templates tab
+                      Template must have these variables:
+                        {{from_name}}, {{reply_to}}, {{phone}}, {{message}}
+
+  4. Admin Login    → Default: username=admin  password=admin123
+                      CHANGE THIS immediately via Admin Panel → Account tab
+                      Access admin: press Ctrl+Shift+A on the website
+
+  5. Social Links   → Already set to instagram.com/wholesalebazaar
+                      Update if your Instagram handle is different
+
+  All other details (phone, email, address) are already filled in.
+═══════════════════════════════════════════════════════════════════
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -50,7 +78,7 @@
   "currenciesAccepted": "INR",
   "paymentAccepted": "Cash on Delivery",
   "telephone": "+91 8840130533",
-  "email": "hello@wholesale-bazaar.in",
+  "email": "wholesalebazaar.support@gmail.com",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Ground floor Anwar market Jhunsi",
@@ -86,6 +114,67 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- ═══ EMAILJS ═══ -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  const EMAILJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';
+  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+  const EMAILJS_WELCOME_TEMPLATE_ID = 'YOUR_WELCOME_TEMPLATE_ID'; // separate welcome email template
+  if(EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY' && typeof emailjs !== 'undefined') emailjs.init(EMAILJS_PUBLIC_KEY);
+</script>
+<!-- ═══ RAZORPAY ═══ -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const RAZORPAY_KEY = 'rzp_test_YOUR_KEY_HERE';
+</script>
+<!-- ═══ FIREBASE (Google Login) ═══ -->
+<!--
+  FIREBASE SETUP — 5 minutes:
+  1. Go to console.firebase.google.com → New Project → name it "wholesale-bazaar"
+  2. Add a Web App → copy the firebaseConfig object below
+  3. Authentication → Sign-in method → Enable "Google" and "Email/Password"
+  4. Replace all the placeholder values below with your real config
+-->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script>
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCrAfvlvZ4oy_6z4hUR86G6kA64nKjMJWg",
+  authDomain: "wholesalebazaar-378a9.firebaseapp.com",
+  projectId: "wholesalebazaar-378a9",
+  storageBucket: "wholesalebazaar-378a9.firebasestorage.app",
+  messagingSenderId: "1018239984544",
+  appId: "1:1018239984544:web:93d74cab61373d645b7ac5",
+  measurementId: "G-W9YBBS5E52"
+  };
+  let firebaseAuth = null;
+  let googleProvider = null;
+  const FIREBASE_READY = FIREBASE_CONFIG.apiKey !== 'YOUR_FIREBASE_API_KEY';
+  if(FIREBASE_READY){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    firebaseAuth  = firebase.auth();
+    googleProvider = new firebase.auth.GoogleAuthProvider();
+    googleProvider.addScope('email');
+    googleProvider.addScope('profile');
+    // Listen for auth state changes — keeps user logged in across devices
+    firebaseAuth.onAuthStateChanged(function(fbUser){
+      if(fbUser){
+        const user = {
+          name:    fbUser.displayName || fbUser.email.split('@')[0],
+          email:   fbUser.email,
+          phone:   fbUser.phoneNumber || '',
+          photo:   fbUser.photoURL || '',
+          uid:     fbUser.uid,
+          joined:  new Date().toLocaleDateString('en-IN'),
+          provider:'google'
+        };
+        saveCurrentUser(user);
+        updateNavUser();
+      }
+    });
+  }
+</script>
 <style>
 :root {
   --bg: #ffffff;
@@ -137,7 +226,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .hero-eyebrow{font-size:.72rem;letter-spacing:.35em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem;animation:fadeUp .8s;}
 .hero-title{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,11vw,7.5rem);font-weight:700;line-height:.9;letter-spacing:-.02em;margin-bottom:1.5rem;animation:fadeUp .8s .1s both;color:#fff;}
 .hero-title em{font-style:italic;color:var(--accent);}
-.hero-sub{font-size:.95rem;color:rgba(255,255,255,.75);max-width:400px;line-height:1.8;margin-bottom:3.5rem;animation:fadeUp .8s .2s both;}
+.hero-sub{font-size:.95rem;color:rgba(255,255,255,.75);max-width:400px;line-height:1.8;margin-bottom:3.5rem;animation:fadeUp .8s .2s both;text-align:center;margin-left:auto;margin-right:auto;}
 .hero-cards{display:flex;gap:1.2rem;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s .3s both;}
 .hero-card{padding:1.5rem 2.8rem;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);cursor:pointer;transition:.4s;font-size:.88rem;letter-spacing:.18em;text-transform:uppercase;position:relative;overflow:hidden;backdrop-filter:blur(10px);color:#fff;}
 .hero-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transition:.4s;}
@@ -346,6 +435,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .user-modal-sub{font-size:.78rem;color:var(--muted);margin-top:.3rem;}
 .user-modal-close{position:absolute;top:.9rem;right:1rem;background:none;border:none;font-size:1.2rem;color:var(--muted);cursor:pointer;transition:color .3s;line-height:1;}
 .user-modal-close:hover{color:var(--text);}
+/* Google Sign-In Button */
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:.82rem 1rem;background:#fff;border:1px solid #dadce0;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;color:#3c4043;cursor:pointer;transition:box-shadow .2s,background .2s;letter-spacing:.01em;}
+.google-btn:hover{box-shadow:0 1px 4px rgba(0,0,0,.15);background:#f8f9fa;}
+.google-btn:active{background:#f1f3f4;}
+.google-btn svg{flex-shrink:0;width:18px;height:18px;}
+.google-btn.loading{opacity:.7;pointer-events:none;}
+.divider-text{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.72rem;margin:.5rem 0;}
+.divider-text::before,.divider-text::after{content:'';flex:1;height:1px;background:var(--border);}
 .user-modal-body{padding:1.5rem 2rem 2rem;}
 .user-tabs{display:flex;margin-bottom:1.5rem;border:1px solid var(--border);}
 .user-tab{flex:1;padding:.6rem;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:.3s;}
@@ -526,17 +623,43 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   .footer-content{grid-template-columns:1fr;}
 }
 /* ═══════════════════════════════════
-   COOKIE CONSENT BANNER
+   PRIVACY & COOKIE CONSENT POPUP
 ═══════════════════════════════════ */
-.cookie-banner{position:fixed;bottom:0;left:0;right:0;background:#111;color:#fff;z-index:9999;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;transform:translateY(100%);transition:transform .4s ease;box-shadow:0 -4px 20px rgba(0,0,0,.3);}
-.cookie-banner.show{transform:translateY(0);}
-.cookie-banner p{font-size:.78rem;color:rgba(255,255,255,.85);line-height:1.6;flex:1;min-width:200px;}
-.cookie-banner a{color:var(--accent);text-decoration:underline;cursor:pointer;}
-.cookie-btns{display:flex;gap:.6rem;flex-shrink:0;}
-.cookie-accept{background:var(--accent);border:none;color:#000;padding:.5rem 1.2rem;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:opacity .3s;}
+/* Overlay backdrop */
+.cookie-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;opacity:0;pointer-events:none;transition:opacity .35s ease;backdrop-filter:blur(3px);}
+.cookie-overlay.show{opacity:1;pointer-events:all;}
+/* Popup card */
+.cookie-banner{position:fixed;bottom:50%;right:50%;transform:translate(50%,50%) scale(.92);z-index:10001;background:#fff;color:var(--text);width:min(520px,92vw);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.22);padding:2.2rem 2rem 1.6rem;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;}
+.cookie-banner.show{opacity:1;pointer-events:all;transform:translate(50%,50%) scale(1);}
+/* Top icon strip */
+.cookie-top{display:flex;align-items:center;gap:.9rem;margin-bottom:1.1rem;}
+.cookie-icon{width:46px;height:46px;background:#fff8ee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:2px solid #ffe5b4;}
+.cookie-top h3{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin-bottom:.15rem;}
+.cookie-top p{font-size:.72rem;color:var(--muted);}
+/* Body text */
+.cookie-body{font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:1.3rem;}
+.cookie-body a{color:var(--accent);text-decoration:underline;cursor:pointer;font-weight:500;}
+/* Toggle rows */
+.cookie-toggles{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.4rem;padding:1rem;background:var(--surface);border-radius:8px;border:1px solid var(--border);}
+.cookie-toggle-row{display:flex;justify-content:space-between;align-items:center;gap:.5rem;}
+.cookie-toggle-label{font-size:.78rem;font-weight:500;}
+.cookie-toggle-sub{font-size:.7rem;color:var(--muted);}
+/* iOS-style toggle */
+.toggle-switch{position:relative;width:38px;height:22px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:22px;cursor:pointer;transition:.25s;}
+.toggle-slider:before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+input:checked+.toggle-slider{background:var(--accent);}
+input:checked+.toggle-slider:before{transform:translateX(16px);}
+input:disabled+.toggle-slider{opacity:.6;cursor:not-allowed;}
+/* Buttons */
+.cookie-btns{display:flex;gap:.7rem;flex-wrap:wrap;}
+.cookie-accept{flex:1;min-width:120px;background:var(--accent);border:none;color:#000;padding:.72rem 1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:opacity .2s;}
 .cookie-accept:hover{opacity:.85;}
-.cookie-decline{background:none;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.7);padding:.5rem 1rem;font-family:'DM Sans',sans-serif;font-size:.78rem;cursor:pointer;transition:.3s;}
-.cookie-decline:hover{border-color:#fff;color:#fff;}
+.cookie-decline{flex:1;min-width:100px;background:none;border:1px solid var(--border);color:var(--muted);padding:.72rem 1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;border-radius:4px;transition:.2s;}
+.cookie-decline:hover{border-color:var(--text);color:var(--text);}
+.cookie-manage{width:100%;background:none;border:none;color:var(--muted);font-size:.72rem;padding:.4rem;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;}
+.cookie-manage:hover{color:var(--accent);}
 
 /* ═══════════════════════════════════
    POLICY MODALS
@@ -573,7 +696,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
    PRINT STYLES (ORDER RECEIPT)
 ═══════════════════════════════════ */
 @media print {
-  nav,footer,.chat-fab,.wa-fab,.back-to-top,.cookie-banner,
+  nav,footer,.chat-fab,.wa-fab,.back-to-top,.cookie-banner,.cookie-overlay,
   .cart-sidebar,.wishlist-sidebar,.quickview-modal,.admin-overlay,
   .user-modal-overlay,.policy-overlay{display:none!important;}
   body{background:#fff;color:#000;}
@@ -588,13 +711,57 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 <!-- SKIP NAV (Accessibility) -->
 <a href="#mainContent" class="skip-nav">Skip to main content</a>
 
-<!-- COOKIE CONSENT BANNER -->
-<div class="cookie-banner" id="cookieBanner" role="alert" aria-live="polite">
-  <p>🍪 We use cookies to improve your experience, remember your cart & wishlist, and analyze site traffic. By continuing, you agree to our <a onclick="openPolicy('privacy')">Privacy Policy</a> and <a onclick="openPolicy('terms')">Terms of Service</a>.</p>
-  <div class="cookie-btns">
-    <button class="cookie-decline" onclick="handleCookie(false)">Decline</button>
-    <button class="cookie-accept" onclick="handleCookie(true)">Accept All</button>
+<!-- PRIVACY & COOKIE CONSENT POPUP -->
+<div class="cookie-overlay" id="cookieOverlay" onclick="handleCookieOverlayClick(event)"></div>
+<div class="cookie-banner" id="cookieBanner" role="dialog" aria-modal="true" aria-labelledby="cookieTitle">
+  <div class="cookie-top">
+    <div class="cookie-icon">🍪</div>
+    <div>
+      <h3 id="cookieTitle">We value your privacy</h3>
+      <p>Wholesale Bazaar · wholesalebazaar.vercel.app</p>
+    </div>
   </div>
+  <div class="cookie-body">
+    We use cookies and similar technologies to enhance your browsing experience, remember your cart &amp; wishlist, and understand how visitors use our site. You can choose which cookies to allow below.
+    Read our <a onclick="openPolicy('privacy')">Privacy Policy</a> and <a onclick="openPolicy('terms')">Terms of Service</a> for full details.
+  </div>
+  <div class="cookie-toggles">
+    <div class="cookie-toggle-row">
+      <div>
+        <div class="cookie-toggle-label">✅ Essential Cookies</div>
+        <div class="cookie-toggle-sub">Cart, wishlist, login — required for the site to work</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" checked disabled>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="cookie-toggle-row">
+      <div>
+        <div class="cookie-toggle-label">📊 Analytics Cookies</div>
+        <div class="cookie-toggle-sub">Google Analytics — helps us improve the site</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggleAnalytics" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="cookie-toggle-row">
+      <div>
+        <div class="cookie-toggle-label">🎯 Marketing Cookies</div>
+        <div class="cookie-toggle-sub">Meta Pixel — helps show relevant ads</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggleMarketing" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+  <div class="cookie-btns">
+    <button class="cookie-decline" onclick="handleCookie(false)">Reject All</button>
+    <button class="cookie-accept" onclick="handleCookie(true)">Accept All ✓</button>
+  </div>
+  <button class="cookie-manage" onclick="handleCookieCustom()">Save my preferences</button>
 </div>
 
 <!-- NAV -->
@@ -609,6 +776,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <button class="nav-section-btn" data-s="kids"       onclick="switchSection('kids')">Kids</button>
     <button class="nav-section-btn" data-s="homekitchen" onclick="switchSection('homekitchen')">Home & Kitchen</button>
     <button class="nav-section-btn" data-s="supplements" onclick="switchSection('supplements')">Supplements</button>
+    <button class="nav-section-btn" onclick="document.getElementById('contactSection').scrollIntoView({behavior:'smooth'})">Contact</button>
   </div>
   <div class="nav-right">
     <div class="hamburger-menu" onclick="toggleMobileMenu(this)">
@@ -647,6 +815,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   <a onclick="switchSection('kids')">Kids</a>
   <a onclick="switchSection('homekitchen')">Home & Kitchen</a>
   <a onclick="switchSection('supplements')">Supplements</a>
+  <a onclick="document.getElementById('contactSection').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').style.display='none'">Contact Us</a>
 </div>
 
 <!-- HERO WITH SLIDESHOW -->
@@ -659,7 +828,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   <div class="hero-content">
     <p class="hero-eyebrow">Spring / Summer 2026</p>
     <h1 class="hero-title">Shop to<br><em>Inspire.</em></h1>
-    <p class="hero-sub">               Fashion, home essentials & wellness — five distinct worlds, one house of style.</p>
+    <p class="hero-sub">Fashion, home essentials &amp; wellness — five distinct worlds, one house of style.</p>
     <div class="hero-cards">
       <div class="hero-card" onclick="switchSection('men')">MEN<small>17 products</small></div>
       <div class="hero-card" onclick="switchSection('women')">WOMEN<small>17 products</small></div>
@@ -847,6 +1016,40 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   <div class="product-grid" id="supplementsGrid"></div>
 </div>
 
+<!-- ═══ CONTACT FORM SECTION ═══ -->
+<section id="contactSection" style="background:#f7f7f7;padding:5rem 2.5rem;border-top:1px solid #ddd;">
+  <div style="max-width:600px;margin:0 auto;">
+    <p style="font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:#FF9900;margin-bottom:.5rem;text-align:center;">Get In Touch</p>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;text-align:center;margin-bottom:.6rem;">Contact Us</h2>
+    <p style="text-align:center;color:#555;font-size:.9rem;margin-bottom:2.5rem;">Have a bulk order enquiry? Fill the form and we'll reply within 24 hours.</p>
+    <form id="contactForm" onsubmit="submitContactForm(event)" style="display:flex;flex-direction:column;gap:1rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div>
+          <label style="font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#555;display:block;margin-bottom:.4rem;">Your Name *</label>
+          <input class="form-input" type="text" id="cf_name" name="from_name" placeholder="Rahul Sharma" required style="width:100%;">
+        </div>
+        <div>
+          <label style="font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#555;display:block;margin-bottom:.4rem;">WhatsApp / Phone *</label>
+          <input class="form-input" type="tel" id="cf_phone" name="phone" placeholder="+91 88401 30533" required style="width:100%;">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#555;display:block;margin-bottom:.4rem;">Email Address *</label>
+        <input class="form-input" type="email" id="cf_email" name="reply_to" placeholder="rahul@yourbusiness.com" required style="width:100%;">
+      </div>
+      <div>
+        <label style="font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#555;display:block;margin-bottom:.4rem;">Your Enquiry *</label>
+        <textarea class="form-input" id="cf_message" name="message" placeholder="Tell us what you need — category, quantity, budget..." required rows="4" style="width:100%;resize:vertical;font-family:'DM Sans',sans-serif;"></textarea>
+      </div>
+      <div id="cf_status" style="font-size:.85rem;display:none;padding:.7rem 1rem;border-radius:4px;"></div>
+      <button type="submit" id="cf_btn" style="background:#FF9900;border:none;color:#000;padding:1rem 2rem;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:opacity .3s;align-self:flex-start;">
+        Send Enquiry →
+      </button>
+    </form>
+    <p style="text-align:center;margin-top:1.5rem;font-size:.82rem;color:#888;">Or WhatsApp us directly: <a href="https://wa.me/918840130533" target="_blank" rel="noopener" style="color:#FF9900;font-weight:600;">+91 88401 30533</a></p>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-content">
@@ -854,9 +1057,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
       <h3>Wholesale Bazaar</h3>
       <p>India's trusted manufacturer and wholesale supplier of premium fashion for men, women, and kids since 2015.</p>
       <div class="social-links">
-        <a class="social-link" href="#" title="Instagram">📸</a>
-        <a class="social-link" href="#" title="Facebook">👍</a>
-        <a class="social-link" href="https://wa.me/919876543210" title="WhatsApp">💬</a>
+        <a class="social-link" href="https://instagram.com/wholesalebazaar" target="_blank" rel="noopener" title="Instagram">📸</a>
+        <a class="social-link" href="https://facebook.com/wholesalebazaar" target="_blank" rel="noopener" title="Facebook">👍</a>
+        <a class="social-link" href="https://wa.me/918840130533" target="_blank" rel="noopener" title="WhatsApp">💬</a>
       </div>
     </div>
     <div class="footer-column">
@@ -881,7 +1084,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <div class="footer-column">
       <h3>Contact Us</h3>
       <div class="contact-info">
-        <div>📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fb939e979794bb8c9394979e889a979ed6999a819a9a89d59295">[email&#160;protected]</a></div>
+        <div>📧 <a href="mailto:wholesalebazaar.support@gmail.com" style="color:inherit;">wholesalebazaar.support@gmail.com</a></div>
         <div>📞 +91 88401 30533</div>
         <div>🕘 Mon–Sat, 9 AM – 8 PM</div>
         <div>📍 Ground Floor Anwar Market Jhunsi, Prayagraj, India</div>
@@ -889,8 +1092,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     </div>
   </div>
   <div class="footer-bottom">
-    <p>© 2026 Wholesale Bazaar. All rights reserved.</p>
-    <p>Manufacturer &amp; Wholesale Supplier</p>
+    <p>© 2026 Wholesale Bazaar. All rights reserved. &nbsp;·&nbsp; Manufacturer &amp; Wholesale Supplier</p>
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center;">
+      <a onclick="document.getElementById('contactSection').scrollIntoView({behavior:'smooth'})" style="font-size:.75rem;color:var(--accent);cursor:pointer;font-weight:600;letter-spacing:.05em;">✉ Get in Touch</a>
+      <a href="https://wa.me/918840130533" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--muted);cursor:pointer;">💬 WhatsApp Us</a>
+      <a onclick="openPolicy('privacy')" style="font-size:.75rem;color:var(--muted);cursor:pointer;">Privacy Policy</a>
+      <a onclick="openPolicy('terms')" style="font-size:.75rem;color:var(--muted);cursor:pointer;">Terms</a>
+      <a onclick="reopenPrivacyPopup()" style="font-size:.75rem;color:var(--muted);cursor:pointer;">🍪 Cookie Settings</a>
+    </div>
   </div>
 </footer>
 
@@ -967,7 +1176,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
           </div>
           <div class="form-group">
             <label class="form-label">Phone</label>
-            <input class="form-input" id="custPhone" placeholder="+91 98765 43210" type="tel">
+            <input class="form-input" id="custPhone" placeholder="+91 88401 30533" type="tel">
           </div>
         </div>
         <div class="form-group">
@@ -992,7 +1201,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <div class="checkout-step" id="step2">
       <h3>Order Summary</h3>
       <div class="checkout-summary" id="orderSummaryItems"></div>
-      <p style="margin-top:1.2rem;font-size:.82rem;color:var(--muted)">Payment: <strong>Cash on Delivery (COD)</strong></p>
+      <p style="margin-top:1.2rem;font-size:.82rem;color:var(--muted)">Choose Payment Method:</p>
+      <div id="paymentOptions" style="display:flex;gap:.8rem;margin-top:.6rem;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.85rem;padding:.6rem 1rem;border:1px solid var(--border);flex:1;min-width:130px;">
+          <input type="radio" name="payMethod" value="cod" checked> 💵 Cash on Delivery
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.85rem;padding:.6rem 1rem;border:1px solid var(--border);flex:1;min-width:130px;">
+          <input type="radio" name="payMethod" value="razorpay"> 💳 Pay Online (Razorpay)
+        </label>
+      </div>
       <div class="checkout-nav">
         <button class="btn-cancel" onclick="document.getElementById('step1').classList.add('active');document.getElementById('step2').classList.remove('active')">← Back</button>
         <button class="btn-primary" onclick="placeOrder()">Place Order ✓</button>
@@ -1057,12 +1274,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     </div>
     <div class="wa-popup-body">
       <div class="wa-popup-msg">👋 Hi! How can we help you today? Ask us about products, orders, or bulk pricing!</div>
-      <a class="wa-popup-cta" href="https://wa.me/919876543210?text=Hi%20Wholesale%20Bazaar!%20I%20need%20help%20with%20" target="_blank" rel="noopener">
+      <a class="wa-popup-cta" href="https://wa.me/918840130533?text=Hi%20Wholesale%20Bazaar!%20I%20need%20help%20with%20" target="_blank" rel="noopener">
         💬 Start Chat on WhatsApp
       </a>
     </div>
   </div>
-  <button class="wa-fab-btn" title="Chat on WhatsApp" onclick="window.open('https://wa.me/919876543210?text=Hi%20Wholesale%20Bazaar!%20I%20need%20help%20with%20','_blank')">
+  <button class="wa-fab-btn" title="Chat on WhatsApp" onclick="window.open('https://wa.me/918840130533?text=Hi%20Wholesale%20Bazaar!%20I%20need%20help%20with%20','_blank')">
     <svg viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
   </button>
 </div>
@@ -1086,6 +1303,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 
       <!-- LOGIN FORM -->
       <div class="user-form active" id="formLogin">
+        <!-- Google Sign-In -->
+        <button class="google-btn" id="googleLoginBtn" onclick="signInWithGoogle()">
+          <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+          Continue with Google
+        </button>
+        <div class="divider-text">or sign in with email</div>
         <div class="form-group">
           <label class="form-label">Email</label>
           <input class="form-input" type="email" id="loginEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doUserLogin()">
@@ -1102,6 +1325,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 
       <!-- SIGNUP FORM -->
       <div class="user-form" id="formSignup">
+        <!-- Google Sign-Up -->
+        <button class="google-btn" id="googleSignupBtn" onclick="signInWithGoogle()">
+          <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+          Sign up with Google
+        </button>
+        <div class="divider-text">or create account with email</div>
         <div class="form-group">
           <label class="form-label">Full Name</label>
           <input class="form-input" type="text" id="signupName" placeholder="Rahul Sharma">
@@ -1112,7 +1341,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
         </div>
         <div class="form-group">
           <label class="form-label">Phone (optional)</label>
-          <input class="form-input" type="tel" id="signupPhone" placeholder="+91 98765 43210">
+          <input class="form-input" type="tel" id="signupPhone" placeholder="+91 88401 30533">
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>
@@ -1139,7 +1368,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
         </div>
         <div class="form-group">
           <label class="form-label">Phone</label>
-          <input class="form-input" type="tel" id="editPhone" placeholder="+91 98765 43210">
+          <input class="form-input" type="tel" id="editPhone" placeholder="+91 88401 30533">
         </div>
         <div class="user-success" id="profileSuccess"></div>
         <button class="btn-primary" style="width:100%;padding:.85rem" onclick="saveUserProfile()">SAVE CHANGES</button>
@@ -1437,7 +1666,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ================================================================
 // STATE
 // ================================================================
@@ -1749,8 +1978,8 @@ document.addEventListener('keydown', e => {
 // SETTINGS
 // ================================================================
 let storeSettings = JSON.parse(localStorage.getItem('wb_settings') || 'null') || {
-  storeName:'Wholesale Bazaar', email:'hello@wholesale-bazaar.in',
-  phone:'+91 98765 43210', freeShipping:999
+  storeName:'Wholesale Bazaar', email:'wholesalebazaar.support@gmail.com',
+  phone:'+91 88401 30533', freeShipping:999
 };
 function loadSettings(){
   document.getElementById('storeName').value = storeSettings.storeName;
@@ -1985,6 +2214,71 @@ function switchUserTab(tab, btn){
   document.getElementById('userModalSub').textContent=t[1];
   if(tab==='profile') populateProfileForm();
 }
+// ================================================================
+// FIREBASE GOOGLE SIGN-IN
+// ================================================================
+function signInWithGoogle(){
+  if(!FIREBASE_READY){
+    showToast(null,'⚠ Google login not set up yet. Please use email & password for now.');
+    return;
+  }
+  const btnL = document.getElementById('googleLoginBtn');
+  const btnS = document.getElementById('googleSignupBtn');
+  if(btnL) btnL.classList.add('loading');
+  if(btnS) btnS.classList.add('loading');
+
+  firebaseAuth.signInWithPopup(googleProvider)
+    .then(result => {
+      const fbUser = result.user;
+      const isNew  = result.additionalUserInfo && result.additionalUserInfo.isNewUser;
+      const user = {
+        name:    fbUser.displayName || fbUser.email.split('@')[0],
+        email:   fbUser.email,
+        phone:   fbUser.phoneNumber || '',
+        photo:   fbUser.photoURL || '',
+        uid:     fbUser.uid,
+        joined:  new Date().toLocaleDateString('en-IN'),
+        provider:'google'
+      };
+      saveCurrentUser(user);
+      updateNavUser();
+      closeUserModal();
+      if(isNew){
+        showToast(null,'🎉 Welcome to Wholesale Bazaar, '+user.name.split(' ')[0]+'!');
+        sendWelcomeEmail(user.name, user.email); // send welcome email on first signup
+        trackEvent('user_signup','User','google');
+      } else {
+        showToast(null,'👋 Welcome back, '+user.name.split(' ')[0]+'!');
+        trackEvent('user_login','User','google');
+      }
+    })
+    .catch(err => {
+      console.error('Google sign-in error:', err);
+      if(err.code === 'auth/popup-closed-by-user') return; // user closed popup — no error needed
+      showToast(null,'Google sign-in failed. Please try email login instead.');
+    })
+    .finally(()=>{
+      if(btnL) btnL.classList.remove('loading');
+      if(btnS) btnS.classList.remove('loading');
+    });
+}
+
+// ================================================================
+// EMAILJS — WELCOME EMAIL (sent on signup)
+// ================================================================
+function sendWelcomeEmail(name, email){
+  if(EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY' || typeof emailjs === 'undefined') return;
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE_ID, {
+    to_name:    name,
+    to_email:   email,
+    reply_to:   'wholesalebazaar.support@gmail.com',
+    first_name: name.split(' ')[0],
+    join_date:  new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}),
+    store_url:  'https://wholesalebazaar.vercel.app',
+    whatsapp:   'https://wa.me/918840130533'
+  }).catch(err => console.warn('Welcome email error:', err));
+}
+
 function doUserLogin(){
   const email = sanitize(document.getElementById('loginEmail').value.trim().toLowerCase());
   const pass  = document.getElementById('loginPass').value;
@@ -2026,6 +2320,7 @@ function doUserSignup(){
     saveCurrentUser(newUser);
     updateNavUser();
     sucEl.textContent='✅ Account created! You are now logged in.';
+    sendWelcomeEmail(name, email); // send welcome email
     setTimeout(()=>{ closeUserModal(); showToast(null,'🎉 Welcome, '+name.split(' ')[0]+'!'); },900);
     trackEvent('user_signup','User','email');
   });
@@ -2048,7 +2343,12 @@ function populateProfileForm(){
   if(!currentUser) return;
   document.getElementById('profileName').textContent  = currentUser.name;
   document.getElementById('profileEmail').textContent = currentUser.email;
-  document.getElementById('profileAvatar').textContent= currentUser.name.charAt(0).toUpperCase();
+  const avatarEl = document.getElementById('profileAvatar');
+  if(currentUser.photo){
+    avatarEl.innerHTML = `<img src="${currentUser.photo}" alt="Profile" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  } else {
+    avatarEl.textContent = currentUser.name.charAt(0).toUpperCase();
+  }
   document.getElementById('editName').value  = currentUser.name;
   document.getElementById('editPhone').value = currentUser.phone||'';
 }
@@ -2123,15 +2423,40 @@ async function hashPassword(password){
 function initCookieBanner(){
   const consent = localStorage.getItem('wb_cookie_consent');
   if(!consent){
-    setTimeout(()=>{ document.getElementById('cookieBanner').classList.add('show'); }, 1200);
+    setTimeout(()=>{
+      document.getElementById('cookieBanner').classList.add('show');
+      document.getElementById('cookieOverlay').classList.add('show');
+    }, 1500);
   }
 }
-function handleCookie(accepted){
-  localStorage.setItem('wb_cookie_consent', accepted ? 'accepted' : 'declined');
+function closeCookiePopup(){
   document.getElementById('cookieBanner').classList.remove('show');
-  if(accepted){
-    trackEvent('cookie_consent','Engagement','accepted');
-  }
+  document.getElementById('cookieOverlay').classList.remove('show');
+}
+function handleCookieOverlayClick(e){
+  // Don't close on overlay click — user must make a choice
+}
+function handleCookie(accepted){
+  const prefs = accepted
+    ? { essential:true, analytics:true, marketing:true }
+    : { essential:true, analytics:false, marketing:false };
+  localStorage.setItem('wb_cookie_consent', JSON.stringify(prefs));
+  closeCookiePopup();
+  if(accepted) trackEvent('cookie_consent','Engagement','accepted_all');
+  else trackEvent('cookie_consent','Engagement','rejected_all');
+}
+function handleCookieCustom(){
+  const analytics  = document.getElementById('toggleAnalytics')?.checked  ?? true;
+  const marketing  = document.getElementById('toggleMarketing')?.checked  ?? true;
+  const prefs = { essential:true, analytics, marketing };
+  localStorage.setItem('wb_cookie_consent', JSON.stringify(prefs));
+  closeCookiePopup();
+  trackEvent('cookie_consent','Engagement','custom');
+}
+// Allow reopening privacy popup from footer
+function reopenPrivacyPopup(){
+  localStorage.removeItem('wb_cookie_consent');
+  initCookieBanner();
 }
 
 // ================================================================
@@ -2158,13 +2483,13 @@ const POLICIES = {
       <h3>5. Third-Party Services</h3>
       <p>We use Google Analytics (anonymized IP) for traffic analysis, Unsplash for product imagery, and WhatsApp Business for customer support. Each of these services has their own privacy policy.</p>
       <h3>6. Your Rights</h3>
-      <p>You have the right to access, correct, or delete your personal data. To exercise these rights, contact us at hello@wholesale-bazaar.in or via WhatsApp at +91 98765 43210.</p>
+      <p>You have the right to access, correct, or delete your personal data. To exercise these rights, contact us at wholesalebazaar.support@gmail.com or via WhatsApp at +91 88401 30533.</p>
       <h3>7. Children's Privacy</h3>
       <p>Our services are not directed to children under 13. We do not knowingly collect personal information from children.</p>
       <h3>8. Changes to This Policy</h3>
       <p>We may update this Privacy Policy from time to time. Continued use of the site after changes constitutes acceptance of the updated policy.</p>
       <h3>9. Contact</h3>
-      <p>For privacy-related queries: hello@wholesale-bazaar.in | +91 98765 43210</p>
+      <p>For privacy-related queries: wholesalebazaar.support@gmail.com | +91 88401 30533</p>
       <p class="policy-last-updated">Last updated: March 2026 | Wholesale Bazaar, Mumbai, Maharashtra, India</p>
     `
   },
@@ -2190,7 +2515,7 @@ const POLICIES = {
       <h3>9. Governing Law</h3>
       <p>These Terms shall be governed by and construed in accordance with the laws of India. Any disputes shall be subject to the exclusive jurisdiction of courts in Mumbai, Maharashtra.</p>
       <h3>10. Contact</h3>
-      <p>For any queries regarding these Terms: hello@wholesale-bazaar.in | +91 98765 43210</p>
+      <p>For any queries regarding these Terms: wholesalebazaar.support@gmail.com | +91 88401 30533</p>
       <p class="policy-last-updated">Last updated: March 2026 | Wholesale Bazaar, Mumbai, Maharashtra, India</p>
     `
   },
@@ -2208,7 +2533,7 @@ const POLICIES = {
         <li>Innerwear, swimwear and customized items are non-returnable for hygiene reasons</li>
       </ul>
       <h3>How to Return</h3>
-      <p>Contact us via WhatsApp (+91 98765 43210) or email (hello@wholesale-bazaar.in) with your Order ID and reason for return. Our team will arrange a pickup within 2 business days.</p>
+      <p>Contact us via WhatsApp (+91 88401 30533) or email (wholesalebazaar.support@gmail.com) with your Order ID and reason for return. Our team will arrange a pickup within 2 business days.</p>
       <h3>Refund Process</h3>
       <ul>
         <li><strong>COD orders:</strong> Refund via bank transfer within 5–7 business days of receiving the item</li>
@@ -2240,7 +2565,7 @@ const POLICIES = {
       <h3>Order Processing</h3>
       <p>Orders placed before 2 PM are processed the same business day. Orders placed after 2 PM or on Sundays and public holidays are processed the next business day.</p>
       <h3>Bulk/Wholesale Orders</h3>
-      <p>For wholesale orders above ₹10,000, we offer priority shipping and dedicated account management. Contact us at hello@wholesale-bazaar.in for wholesale pricing.</p>
+      <p>For wholesale orders above ₹10,000, we offer priority shipping and dedicated account management. Contact us at wholesalebazaar.support@gmail.com for wholesale pricing.</p>
       <p class="policy-last-updated">Last updated: March 2026</p>
     `
   }
@@ -2521,8 +2846,47 @@ function placeOrder(){
   const addr  = sanitize(document.getElementById('custAddr').value.trim());
   const pin   = sanitize(document.getElementById('custPin').value.trim());
   const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+
+  // Check which payment method is selected
+  const payMethod = document.querySelector('input[name="payMethod"]:checked')?.value || 'cod';
+
+  if(payMethod === 'razorpay'){
+    // ── RAZORPAY ONLINE PAYMENT ──
+    if(RAZORPAY_KEY === 'rzp_test_YOUR_KEY_HERE' || typeof Razorpay === 'undefined'){
+      showToast(null,'⚠ Razorpay key not set yet. Using COD instead.');
+      finalizeOrder(name,phone,email,addr,pin,total,'COD');
+      return;
+    }
+    const options = {
+      key: RAZORPAY_KEY,
+      amount: total * 100, // paise
+      currency: 'INR',
+      name: 'Wholesale Bazaar',
+      description: 'Fashion Order',
+      handler: function(response){
+        // Payment successful!
+        finalizeOrder(name,phone,email,addr,pin,total,'Razorpay:'+response.razorpay_payment_id);
+      },
+      prefill: { name, email, contact: phone },
+      theme: { color: '#FF9900' },
+      modal: {
+        ondismiss: function(){ showToast(null,'Payment cancelled. Order not placed.'); }
+      }
+    };
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(response){
+      showToast(null,'Payment failed: ' + response.error.description);
+    });
+    rzp.open();
+  } else {
+    // ── CASH ON DELIVERY ──
+    finalizeOrder(name,phone,email,addr,pin,total,'COD');
+  }
+}
+
+function finalizeOrder(name,phone,email,addr,pin,total,payMode){
   const orderId='WB-'+Date.now().toString().slice(-8)+'-'+Math.floor(1000+Math.random()*9000);
-  const order={id:orderId,name,phone,email,address:addr+', '+pin,items:[...cart],total,status:'Pending',date:new Date().toLocaleString('en-IN')};
+  const order={id:orderId,name,phone,email,address:addr+', '+pin,items:[...cart],total,status:'Pending',payMode,date:new Date().toLocaleString('en-IN')};
   orders.unshift(order);
   localStorage.setItem('wb_orders',JSON.stringify(orders));
   document.getElementById('finalOrderId').textContent=orderId;
@@ -2531,7 +2895,70 @@ function placeOrder(){
   cart=[];
   saveCart();
   updateCartUI();
-  trackEvent('purchase','Ecommerce','COD_₹'+total);
+  trackEvent('purchase','Ecommerce',payMode+'_₹'+total);
+  // Send order confirmation email via EmailJS
+  sendOrderConfirmationEmail(orderId,name,email,phone,total,payMode);
+}
+
+// ================================================================
+// EMAILJS — CONTACT FORM
+// ================================================================
+function submitContactForm(e){
+  e.preventDefault();
+  const btn    = document.getElementById('cf_btn');
+  const status = document.getElementById('cf_status');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+
+  if(EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY' || typeof emailjs === 'undefined'){
+    // EmailJS not set up yet — show WhatsApp fallback
+    status.textContent = '⚠ Email not set up yet. Please WhatsApp us on +91 88401 30533 with your enquiry!';
+    status.style.display = 'block';
+    status.style.background = '#fff3cd';
+    status.style.color = '#856404';
+    btn.textContent = 'Send Enquiry →';
+    btn.disabled = false;
+    return;
+  }
+
+  emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, e.target)
+    .then(()=>{
+      status.textContent = '✅ Enquiry sent! We\'ll reply within 24 hours.';
+      status.style.display = 'block';
+      status.style.background = '#d4edda';
+      status.style.color = '#155724';
+      e.target.reset();
+    })
+    .catch(err=>{
+      console.error('EmailJS error:', err);
+      status.textContent = '❌ Could not send. Please WhatsApp us on +91 88401 30533';
+      status.style.display = 'block';
+      status.style.background = '#f8d7da';
+      status.style.color = '#721c24';
+    })
+    .finally(()=>{
+      btn.textContent = 'Send Enquiry →';
+      btn.disabled = false;
+    });
+}
+
+// ================================================================
+// EMAILJS — ORDER CONFIRMATION
+// ================================================================
+function sendOrderConfirmationEmail(orderId,name,email,phone,total,payMode){
+  if(EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY') return; // skip if not set up
+  // You need a separate "order confirmation" template in EmailJS for this
+  // Template variables: {{order_id}}, {{customer_name}}, {{reply_to}}, {{phone}}, {{total}}, {{pay_mode}}
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    order_id: orderId,
+    from_name: 'Wholesale Bazaar',
+    customer_name: name,
+    reply_to: email,
+    phone: phone,
+    total: '₹' + total.toLocaleString('en-IN'),
+    pay_mode: payMode,
+    message: 'Your order ' + orderId + ' has been placed successfully! We will contact you at ' + phone + ' to confirm delivery. Expected: 3–5 business days.'
+  }).catch(err => console.warn('Order email error:', err));
 }
 
 // ================================================================
@@ -2566,37 +2993,30 @@ function sendChat(){
   chatHistory.push({role:'user',content:msg});
   const typing=document.getElementById('chatTyping');
   typing.classList.add('visible');
-  if(apiKey){
-    fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,system:'You are a helpful assistant for Wholesale Bazaar, a fashion store. Be concise and friendly.',messages:chatHistory})
-    }).then(r=>r.json()).then(data=>{
-      typing.classList.remove('visible');
-      const reply=data.content?.[0]?.text||mockReply(msg);
-      appendMsg(reply,'bot');
-      chatHistory.push({role:'assistant',content:reply});
-    }).catch(()=>{
-      typing.classList.remove('visible');
-      appendMsg(mockReply(msg),'bot');
-    });
-  } else {
-    setTimeout(()=>{typing.classList.remove('visible'); appendMsg(mockReply(msg),'bot');},800);
-  }
+  // Note: Anthropic API doesn't support direct browser calls (CORS).
+  // The chatbot always uses the smart offline fallback below.
+  // To use AI, set up a simple backend proxy and call that instead.
+  setTimeout(()=>{typing.classList.remove('visible'); appendMsg(mockReply(msg),'bot');},700);
 }
 function mockReply(msg){
   const m=msg.toLowerCase();
-  if(/^(hi|hello|hey|namaste)/.test(m)) return "Hey! 👋 Welcome to <strong>Wholesale Bazaar</strong>. How can I help you today?";
-  if(/men|shirt|blazer|trouser/.test(m)) return "Our <strong>Men's</strong> collection has 17 items — from Oxford Shirts (₹1,299) to a Tailored Blazer (₹4,999). Check the Men section!";
-  if(/women|dress|saree|kurti/.test(m)) return "Explore <strong>Women's</strong>: Silk Sarees (₹3,999), Floral Dresses (₹1,899) and much more!";
-  if(/kids|toy|school|child/.test(m)) return "<strong>Kids'</strong> range: school uniforms, princess dresses, joggers — all ₹499–₹1,499.";
-  if(/price|cost|cheap|afford/.test(m)) return "Prices start at <strong>₹499</strong>! Free shipping on orders above ₹"+storeSettings.freeShipping+".";
-  if(/size|fit|sizing/.test(m)) return "Adults: XS–XXL. Kids: 2Y–12Y. Select your size in the product quickview!";
-  if(/return|refund|exchange/.test(m)) return "<strong>7-day</strong> hassle-free returns. Email "+storeSettings.email+" or call "+storeSettings.phone+".";
-  if(/deliver|ship/.test(m)) return "Standard delivery 3–5 business days. Free shipping above ₹"+storeSettings.freeShipping+"!";
-  if(/discount|coupon|sale/.test(m)) return "Check <strong>SALE</strong> badges for discounted items — up to 20% off!";
-  if(/contact|support/.test(m)) return "📧 "+storeSettings.email+"<br>📞 "+storeSettings.phone+" (Mon–Sat 9am–8pm)";
-  return "I'm here to help! Ask about products, sizing, shipping, or returns.";
+  if(/^(hi|hello|hey|namaste|hii|helo)/.test(m)) return "Hey! 👋 Welcome to <strong>Wholesale Bazaar</strong> – Prayagraj's trusted wholesale fashion supplier. How can I help you today?";
+  if(/bulk|wholesale|moq|minimum order/.test(m)) return "Minimum order quantity (MOQ) starts at <strong>10 pieces</strong> per style. For bulk orders above 50 pieces, call us for special pricing! 📞 +91 88401 30533";
+  if(/men|shirt|blazer|trouser/.test(m)) return "Our <strong>Men's</strong> collection has 17 items — Oxford Shirts (₹1,299), Blazers (₹4,999) and more. Click 'Men' in the menu to browse!";
+  if(/women|dress|saree|kurti|lehenga/.test(m)) return "Explore <strong>Women's</strong>: Banarasi Silk Sarees (₹3,999), Embroidered Kurtis (₹899), Floral Dresses (₹1,899) and more!";
+  if(/kids|toy|school|child|baby/.test(m)) return "<strong>Kids'</strong> range: school uniforms, princess dresses, joggers — all ₹499–₹1,499.";
+  if(/home|kitchen|utensil|appliance/.test(m)) return "Our <strong>Home & Kitchen</strong> section has premium cookware, storage and decor items. Browse using the top menu!";
+  if(/supplement|protein|gym|fitness|creatine/.test(m)) return "We stock top supplements — Whey Protein (₹3,499), Creatine (₹899), Pre-Workout (₹1,499) and more in our Supplements section!";
+  if(/price|cost|cheap|afford|rate/.test(m)) return "Prices start at <strong>₹299</strong>! Free shipping on orders above ₹"+storeSettings.freeShipping+". Wholesale rates available on bulk orders.";
+  if(/size|fit|sizing/.test(m)) return "Adults: XS–XXL. Kids: 2Y–12Y. Select your size in the product card!";
+  if(/return|refund|exchange/.test(m)) return "<strong>7-day</strong> hassle-free returns on all items. Email "+storeSettings.email+" or WhatsApp us at +91 88401 30533.";
+  if(/deliver|ship|courier/.test(m)) return "We deliver PAN India via Delhivery & DTDC. Standard delivery 3–5 business days. Free shipping above ₹"+storeSettings.freeShipping+"!";
+  if(/pay|payment|razorpay|upi|cod/.test(m)) return "We accept <strong>Cash on Delivery (COD)</strong> and <strong>Online Payment</strong> via Razorpay (UPI, cards, net banking). Choose at checkout!";
+  if(/discount|coupon|sale|offer/.test(m)) return "Check <strong>SALE</strong> badges on products for discounts up to 20%! For bulk order discounts, call +91 88401 30533.";
+  if(/contact|support|help|phone|whatsapp/.test(m)) return "📧 "+storeSettings.email+"<br>📞 +91 88401 30533 (Mon–Sat 9am–8pm)<br>📍 Ground Floor Anwar Market, Jhunsi, Prayagraj";
+  if(/location|address|where|prayagraj|allahabad/.test(m)) return "We're located at <strong>Ground Floor, Anwar Market, Jhunsi, Prayagraj</strong>. Visit us Mon–Sat 9AM–8PM!";
+  if(/gst|invoice|bill/.test(m)) return "Yes, we provide GST invoices on all bulk orders. Share your GSTIN at the time of placing your order and we'll include it.";
+  return "I'm here to help! Ask me about products, bulk pricing, sizes, shipping, returns or payment. You can also WhatsApp us at <strong>+91 88401 30533</strong>. 🙂";
 }
 function appendMsg(text,role){
   const msgs=document.getElementById('chatMessages');
