@@ -1,16 +1,7 @@
 <!DOCTYPE html>
--->
+
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-87K7JYWHKL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-87K7JYWHKL');
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- ═══ SEO ═══ -->
@@ -82,7 +73,7 @@
 </script>
 <!-- ═══ GOOGLE ANALYTICS GA4 ═══ -->
 <!-- REPLACE G-XXXXXXXXXX WITH YOUR REAL MEASUREMENT ID FROM analytics.google.com -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G-87K7JYWHKL"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -122,13 +113,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script>
   const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyCrAfvlvZ4oy_6z4hUR86G6kA64nKjMJWg",
-  authDomain: "wholesalebazaar-378a9.firebaseapp.com",
-  projectId: "wholesalebazaar-378a9",
-  storageBucket: "wholesalebazaar-378a9.firebasestorage.app",
-  messagingSenderId: "1018239984544",
-  appId: "1:1018239984544:web:93d74cab61373d645b7ac5",
-  measurementId: "G-W9YBBS5E52"
+    apiKey:            "YOUR_FIREBASE_API_KEY",
+    authDomain:        "YOUR_PROJECT.firebaseapp.com",
+    projectId:         "YOUR_PROJECT_ID",
+    storageBucket:     "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId:             "YOUR_APP_ID"
   };
   let firebaseAuth = null;
   let googleProvider = null;
@@ -660,24 +650,24 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
    PRIVACY & COOKIE CONSENT POPUP
 ═══════════════════════════════════ */
 /* Overlay backdrop */
-.wb-privacy-layer{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;opacity:0;pointer-events:none;transition:opacity .35s ease;}
-.wb-privacy-layer.show{opacity:1;pointer-events:all;}
+.wb-consent-veil{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;opacity:0;pointer-events:none;transition:opacity .35s ease;}
+.wb-consent-veil.show{opacity:1;pointer-events:all;}
 /* Popup card */
-.wb-privacy-notice{position:fixed;bottom:50%;right:50%;transform:translate(50%,50%) scale(.92);z-index:10001;background:#fff;color:var(--text);width:min(520px,92vw);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.22);padding:2.2rem 2rem 1.6rem;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;}
-.wb-privacy-notice.show{opacity:1;pointer-events:all;transform:translate(50%,50%) scale(1);}
+.wb-consent-box{position:fixed;bottom:50%;right:50%;transform:translate(50%,50%) scale(.92);z-index:10001;background:#fff;color:var(--text);width:min(520px,92vw);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.22);padding:2.2rem 2rem 1.6rem;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;}
+.wb-consent-box.show{opacity:1;pointer-events:all;transform:translate(50%,50%) scale(1);}
 /* Top icon strip */
-.cookie-top{display:flex;align-items:center;gap:.9rem;margin-bottom:1.1rem;}
-.cookie-icon{width:46px;height:46px;background:#fff8ee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:2px solid #ffe5b4;}
-.cookie-top h3{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin-bottom:.15rem;}
-.cookie-top p{font-size:.72rem;color:var(--muted);}
+.wb-ct-top{display:flex;align-items:center;gap:.9rem;margin-bottom:1.1rem;}
+.wb-ct-icon{width:46px;height:46px;background:#fff8ee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:2px solid #ffe5b4;}
+.wb-ct-top h3{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin-bottom:.15rem;}
+.wb-ct-top p{font-size:.72rem;color:var(--muted);}
 /* Body text */
-.cookie-body{font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:1.3rem;}
-.cookie-body a{color:var(--accent);text-decoration:underline;cursor:pointer;font-weight:500;}
+.wb-ct-body{font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:1.3rem;}
+.wb-ct-body a{color:var(--accent);text-decoration:underline;cursor:pointer;font-weight:500;}
 /* Toggle rows */
-.cookie-toggles{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.4rem;padding:1rem;background:var(--surface);border-radius:8px;border:1px solid var(--border);}
-.cookie-toggle-row{display:flex;justify-content:space-between;align-items:center;gap:.5rem;}
-.cookie-toggle-label{font-size:.78rem;font-weight:500;}
-.cookie-toggle-sub{font-size:.7rem;color:var(--muted);}
+.wb-ct-list{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.4rem;padding:1rem;background:var(--surface);border-radius:8px;border:1px solid var(--border);}
+.wb-ct-row{display:flex;justify-content:space-between;align-items:center;gap:.5rem;}
+.wb-ct-label{font-size:.78rem;font-weight:500;}
+.wb-ct-sub{font-size:.7rem;color:var(--muted);}
 /* iOS-style toggle */
 .toggle-switch{position:relative;width:38px;height:22px;flex-shrink:0;}
 .toggle-switch input{opacity:0;width:0;height:0;}
@@ -687,13 +677,13 @@ input:checked+.toggle-slider{background:var(--accent);}
 input:checked+.toggle-slider:before{transform:translateX(16px);}
 input:disabled+.toggle-slider{opacity:.6;cursor:not-allowed;}
 /* Buttons */
-.cookie-btns{display:flex;gap:.7rem;flex-wrap:wrap;}
-.wb-pn-agree{flex:1;min-width:120px;background:var(--accent);border:none;color:#000;padding:.72rem 1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:opacity .2s;}
-.wb-pn-agree:hover{opacity:.85;}
-.wb-pn-reject{flex:1;min-width:100px;background:none;border:1px solid var(--border);color:var(--muted);padding:.72rem 1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;border-radius:4px;transition:.2s;}
-.wb-pn-reject:hover{border-color:var(--text);color:var(--text);}
-.cookie-manage{width:100%;background:none;border:none;color:var(--muted);font-size:.72rem;padding:.4rem;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;}
-.cookie-manage:hover{color:var(--accent);}
+.wb-ct-btns{display:flex;gap:.7rem;flex-wrap:wrap;}
+.wb-ct-yes{flex:1;min-width:120px;background:var(--accent);border:none;color:#000;padding:.72rem 1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:opacity .2s;}
+.wb-ct-yes:hover{opacity:.85;}
+.wb-ct-no{flex:1;min-width:100px;background:none;border:1px solid var(--border);color:var(--muted);padding:.72rem 1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;border-radius:4px;transition:.2s;}
+.wb-ct-no:hover{border-color:var(--text);color:var(--text);}
+.wb-ct-custom{width:100%;background:none;border:none;color:var(--muted);font-size:.72rem;padding:.4rem;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;}
+.wb-ct-custom:hover{color:var(--accent);}
 
 /* ═══════════════════════════════════
    POLICY MODALS
@@ -730,7 +720,7 @@ input:disabled+.toggle-slider{opacity:.6;cursor:not-allowed;}
    PRINT STYLES (ORDER RECEIPT)
 ═══════════════════════════════════ */
 @media print {
-  nav,footer,.chat-fab,.wa-fab,.back-to-top,.wb-privacy-notice,.wb-privacy-layer,
+  nav,footer,.chat-fab,.wa-fab,.back-to-top,.wb-consent-box,.wb-consent-veil,
   .cart-sidebar,.wishlist-sidebar,.quickview-modal,.admin-overlay,
   .user-modal-overlay,.policy-overlay{display:none!important;}
   body{background:#fff;color:#000;}
@@ -746,44 +736,44 @@ input:disabled+.toggle-slider{opacity:.6;cursor:not-allowed;}
 <a href="#mainContent" class="skip-nav">Skip to main content</a>
 
 <!-- PRIVACY & COOKIE CONSENT POPUP -->
-<div class="cookie-overlay" id="cookieOverlay" onclick="handleCookieOverlayClick(event)"></div>
-<div class="cookie-banner" id="cookieBanner" role="dialog" aria-modal="true" aria-labelledby="cookieTitle">
-  <div class="cookie-top">
-    <div class="cookie-icon">🍪</div>
+<div class="wb-consent-veil" id="wb-consent-veil" onclick="handleCookieOverlayClick(event)"></div>
+<div class="wb-consent-box" id="wb-consent-box" role="dialog" aria-modal="true" aria-labelledby="cookieTitle">
+  <div class="wb-ct-top">
+    <div class="wb-ct-icon">🍪</div>
     <div>
       <h3 id="cookieTitle">We value your privacy</h3>
       <p>Wholesale Bazaar · wholesalebazaar.vercel.app</p>
     </div>
   </div>
-  <div class="cookie-body">
+  <div class="wb-ct-body">
     We use cookies and similar technologies to enhance your browsing experience, remember your cart &amp; wishlist, and understand how visitors use our site. You can choose which cookies to allow below.
     Read our <a onclick="openPolicy('privacy')">Privacy Policy</a> and <a onclick="openPolicy('terms')">Terms of Service</a> for full details.
   </div>
-  <div class="cookie-toggles">
-    <div class="cookie-toggle-row">
+  <div class="wb-ct-list">
+    <div class="wb-ct-row">
       <div>
-        <div class="cookie-toggle-label">✅ Essential Cookies</div>
-        <div class="cookie-toggle-sub">Cart, wishlist, login — required for the site to work</div>
+        <div class="wb-ct-label">✅ Essential Cookies</div>
+        <div class="wb-ct-sub">Cart, wishlist, login — required for the site to work</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" checked disabled>
         <span class="toggle-slider"></span>
       </label>
     </div>
-    <div class="cookie-toggle-row">
+    <div class="wb-ct-row">
       <div>
-        <div class="cookie-toggle-label">📊 Analytics Cookies</div>
-        <div class="cookie-toggle-sub">Google Analytics — helps us improve the site</div>
+        <div class="wb-ct-label">📊 Analytics Cookies</div>
+        <div class="wb-ct-sub">Google Analytics — helps us improve the site</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="toggleAnalytics" checked>
         <span class="toggle-slider"></span>
       </label>
     </div>
-    <div class="cookie-toggle-row">
+    <div class="wb-ct-row">
       <div>
-        <div class="cookie-toggle-label">🎯 Marketing Cookies</div>
-        <div class="cookie-toggle-sub">Meta Pixel — helps show relevant ads</div>
+        <div class="wb-ct-label">🎯 Marketing Cookies</div>
+        <div class="wb-ct-sub">Meta Pixel — helps show relevant ads</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="toggleMarketing" checked>
@@ -791,11 +781,11 @@ input:disabled+.toggle-slider{opacity:.6;cursor:not-allowed;}
       </label>
     </div>
   </div>
-  <div class="cookie-btns">
-    <button class="cookie-decline" onclick="handleCookie(false)">Reject All</button>
-    <button class="cookie-accept" onclick="handleCookie(true)">Accept All ✓</button>
+  <div class="wb-ct-btns">
+    <button class="wb-ct-no" onclick="handleCookie(false)">Reject All</button>
+    <button class="wb-ct-yes" onclick="handleCookie(true)">Accept All ✓</button>
   </div>
-  <button class="cookie-manage" onclick="handleCookieCustom()">Save my preferences</button>
+  <button class="wb-ct-custom" onclick="handleCookieCustom()">Save my preferences</button>
 </div>
 
 <!-- NAV -->
@@ -1104,7 +1094,7 @@ input:disabled+.toggle-slider{opacity:.6;cursor:not-allowed;}
           </div>
           <div>
             <label style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.4rem;">WhatsApp / Phone *</label>
-            <input class="form-input" type="tel" id="cf_phone" name="phone" placeholder="+91 9876543210" required style="width:100%;">
+            <input class="form-input" type="tel" id="cf_phone" name="phone" placeholder="+91 88401 30533" required style="width:100%;">
           </div>
         </div>
         <div>
@@ -1306,7 +1296,7 @@ input:disabled+.toggle-slider{opacity:.6;cursor:not-allowed;}
           </div>
           <div class="form-group">
             <label class="form-label">Phone</label>
-            <input class="form-input" id="custPhone" placeholder="+91 9876543210" type="tel">
+            <input class="form-input" id="custPhone" placeholder="+91 88401 30533" type="tel">
           </div>
         </div>
         <div class="form-group">
@@ -2588,17 +2578,17 @@ async function hashPassword(password){
 // COOKIE CONSENT
 // ================================================================
 function initCookieBanner(){
-  const consent = localStorage.getItem('wb_cookie_consent');
+  const consent = localStorage.getItem('wb_cs');
   if(!consent){
     setTimeout(()=>{
-      document.getElementById('cookieBanner').classList.add('show');
-      document.getElementById('cookieOverlay').classList.add('show');
+      document.getElementById('wb-consent-box').classList.add('show');
+      document.getElementById('wb-consent-veil').classList.add('show');
     }, 1500);
   }
 }
 function closeCookiePopup(){
-  document.getElementById('cookieBanner').classList.remove('show');
-  document.getElementById('cookieOverlay').classList.remove('show');
+  document.getElementById('wb-consent-box').classList.remove('show');
+  document.getElementById('wb-consent-veil').classList.remove('show');
 }
 function handleCookieOverlayClick(e){
   // Don't close on overlay click — user must make a choice
@@ -2607,7 +2597,7 @@ function handleCookie(accepted){
   const prefs = accepted
     ? { essential:true, analytics:true, marketing:true }
     : { essential:true, analytics:false, marketing:false };
-  localStorage.setItem('wb_cookie_consent', JSON.stringify(prefs));
+  localStorage.setItem('wb_cs', JSON.stringify(prefs));
   closeCookiePopup();
   if(accepted) trackEvent('cookie_consent','Engagement','accepted_all');
   else trackEvent('cookie_consent','Engagement','rejected_all');
@@ -2616,13 +2606,13 @@ function handleCookieCustom(){
   const analytics  = document.getElementById('toggleAnalytics')?.checked  ?? true;
   const marketing  = document.getElementById('toggleMarketing')?.checked  ?? true;
   const prefs = { essential:true, analytics, marketing };
-  localStorage.setItem('wb_cookie_consent', JSON.stringify(prefs));
+  localStorage.setItem('wb_cs', JSON.stringify(prefs));
   closeCookiePopup();
   trackEvent('cookie_consent','Engagement','custom');
 }
 // Allow reopening privacy popup from footer
 function reopenPrivacyPopup(){
-  localStorage.removeItem('wb_cookie_consent');
+  localStorage.removeItem('wb_cs');
   initCookieBanner();
 }
 
