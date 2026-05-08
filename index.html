@@ -1681,7 +1681,7 @@ input:disabled+.toggle-slider{opacity:.6;cursor:not-allowed;}
             </div>
             <div class="form-group">
               <label class="form-label">AI Chatbot — Groq API Key </label>
-              <input class="form-input" type="password" id="apiKeyField" placeholder="gsk_…" oninput="saveApiKey(this.value)>
+              <input class="form-input" type="password" id="apiKeyField" placeholder="gsk_…" oninput="saveApiKey(this.value)">
               <small style="color:var(--muted);font-size:.7rem;margin-top:.3rem;display:block">Get a free key at <a href="https://console.groq.com" target="_blank" style="color:var(--accent)">console.groq.com</a> → API Keys</small>
             </div>
             <button class="btn-primary" style="align-self:flex-start" onclick="saveSettings()">Save Settings</button>
@@ -2625,12 +2625,6 @@ function handleCookieCustom(){
 function reopenPrivacyPopup(){
   localStorage.removeItem('wb_cookie_consent');
   document.getElementById('cookieBanner').classList.add('show');
-}
-  // Live product counts in hero cards
-  ['men','women','kids','homekitchen','supplements'].forEach(s=>{
-    const el=document.getElementById('hc_'+s);
-    if(el) el.textContent=allProducts.filter(p=>p.section===s).length+' products';
-  });
 }
 
 // ================================================================
@@ -3626,6 +3620,11 @@ function init(){
   // Add GA tracking to section switches
   document.querySelectorAll('.nav-section-btn').forEach(btn=>{
     btn.addEventListener('click',()=> trackEvent('section_view','Navigation', btn.dataset.s));
+  });
+   // Live product counts in hero cards
+  ['men','women','kids','homekitchen','supplements'].forEach(s=>{
+    const el=document.getElementById('hc_'+s);
+    if(el) el.textContent=allProducts.filter(p=>p.section===s).length+' products';
   });
 }
 
