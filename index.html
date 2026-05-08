@@ -680,8 +680,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .cookie-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;opacity:0;pointer-events:none;transition:opacity .35s ease;}
 .cookie-overlay.show{opacity:1;pointer-events:all;}
 /* Popup card */
-.cookie-banner{position:fixed;bottom:50%;right:50%;transform:translate(50%,50%) scale(.92);z-index:10001;background:#fff;color:var(--text);width:min(520px,92vw);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.22);padding:2.2rem 2rem 1.6rem;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;}
-.cookie-banner.show{opacity:1;pointer-events:all;transform:translate(50%,50%) scale(1);}
+.cookie-banner{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%) translateY(20px);z-index:10001;background:#fff;color:var(--text);width:min(560px,94vw);border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.18);padding:1.6rem 1.8rem 1.4rem;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;}
+.cookie-banner.show{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
 /* Top icon strip */
 .cookie-top{display:flex;align-items:center;gap:.9rem;margin-bottom:1.1rem;}
 .cookie-icon{width:46px;height:46px;background:#fff8ee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:2px solid #ffe5b4;}
@@ -2589,9 +2589,13 @@ function initCookieBanner(){
   if(!consent){
     setTimeout(()=>{
       document.getElementById('cookieBanner').classList.add('show');
-      document.getElementById('cookieOverlay').classList.add('show');
+       // No overlay — don't block the page
     }, 1500);
   }
+}
+function closeCookiePopup(){
+  document.getElementById('cookieBanner').classList.remove('show');
+  document.getElementById('cookieOverlay').classList.remove('show');
 }
 function closeCookiePopup(){
   document.getElementById('cookieBanner').classList.remove('show');
@@ -2620,7 +2624,8 @@ function handleCookieCustom(){
 // Allow reopening privacy popup from footer
 function reopenPrivacyPopup(){
   localStorage.removeItem('wb_cookie_consent');
-  initCookieBanner();
+  document.getElementById('cookieBanner').classList.add('show');
+}
   // Live product counts in hero cards
   ['men','women','kids','homekitchen','supplements'].forEach(s=>{
     const el=document.getElementById('hc_'+s);
