@@ -3206,7 +3206,6 @@ Keep replies short, friendly and under 3 sentences. Use emojis sparingly. Always
     // No API key — smart offline fallback
     setTimeout(()=>{ typing.classList.remove('visible'); appendMsg(mockReply(msg),'bot'); }, 700);
   }
-}
 function mockReply(msg){
   const m=msg.toLowerCase();
   if(/^(hi|hello|hey|namaste|hii|helo)/.test(m)) return "Hey! 👋 Welcome to <strong>Wholesale Baazar</strong> – Prayagraj's trusted wholesale fashion supplier. How can I help you today?";
