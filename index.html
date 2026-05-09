@@ -3202,7 +3202,7 @@ Keep replies short, friendly and under 3 sentences. Use emojis sparingly. Always
       typing.classList.remove('visible');
       appendMsg(mockReply(msg), 'bot');
     }
-  } else {
+  }
     // No API key — smart offline fallback
     setTimeout(()=>{ typing.classList.remove('visible'); appendMsg(mockReply(msg),'bot'); }, 700);
   }
